@@ -121,8 +121,7 @@ So first of all, make sure to have:
 - Version 555.42.02 or a higher version of the Nvidia driver
 - GNOME 46.1 or a higher version on your Fedora installation
 
-#### Pay attention please
-The packages shipped by the RPMFusion repository should already handle configuring everything for you to ensure the smoothest experience possible (for both Xorg and Wayland). However, if you are still experiencing issues, continue reading below:
+then continue reading below to make the experience even smoother:
 
 * Your system may be using the Mesa driver instead of the NVIDIA one on Wayland sessions. You can confirm this by typing `glxinfo|egrep "OpenGL vendor|OpenGL renderer*"`
 
