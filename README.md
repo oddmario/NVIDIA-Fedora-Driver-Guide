@@ -5,10 +5,9 @@ I am personally an **Fedora 40** user at the moment, so this is mostly what this
 
 ## Index of content
 - [Driver installation](#driver-installation)
-  * [Through the official NVIDIA installer from the Nvidia.com website](#installing-through-the-official-nvidia-installer-from-the-nvidiacom-website)
 - [Driver uninstallation](#driver-uninstallation)
-  * [When installed through the official NVIDIA installer from the Nvidia.com website](#uninstalling-the-driver-when-installed-through-the-official-nvidia-installer-from-the-nvidiacom-website)
 - [Issues faced after installing the NVIDIA drivers, and how to solve them](#issues-faced-after-installing-the-nvidia-drivers-and-how-to-solve-them)
+  * [Fix VLC black screen issue](#getting-a-black-screen-on-video-players-vlc-etc)
   * [Wayland is no longer enabled/not visible on the login screen](#wayland-is-not-shown-as-an-option-on-the-login-screen-or-the-cog-icon-of-the-login-screen-doesnt-show-at-all)
   * [Fix Wayland issues (flickering, etc.)](#the-experience-on-wayland-is-not-the-smoothest-fix-wayland-issues)
 - [References](#references)
@@ -17,87 +16,33 @@ I am personally an **Fedora 40** user at the moment, so this is mostly what this
 
 ## Driver installation
 
-### Installing through the official NVIDIA installer from the Nvidia.com website
-
-This procedure is more advanced and is often not recommended. And despite so, this is actually the method that I use to maintain an installation of the driver on my own system(s). It shall go alright as long as you follow each step with patience and care :)
-
-1. Ensure that you have uninstalled any previously installed NVIDIA drivers by running the below commands:
-```
-sudo dnf remove xorg-x11-drv-nvidia\*
-reboot
-```
-
-2. Upgrade the system packages and install the required dependencies:
-```
-sudo dnf upgrade
-sudo dnf install kernel-devel kernel-headers gcc make dkms acpid libglvnd-glx libglvnd-opengl libglvnd-devel pkgconfig
-```
-
-3. Navigate to https://www.nvidia.com/Download/index.aspx?lang=en-us and download the proper driver for your GPU and Linux architecture. The website should give you a file that ends with the `.run` file extension.
-
-**NOTE:** It would be lovely to store the downloaded `.run` file in a permanent place because you will need the exact same file if you would like to uninstall the driver later.
-
-4. Switch to the terminal view of your system by pressing `Alt + Ctrl + F3` (if this does not switch from the GUI mode to the terminal mode for you, try `Alt + Ctrl + F1` or `Alt + Ctrl + F2` instead for a different tty)
-
-**NOTE:** Something that freaked me out on the Fedora terminal tty is that using the backspace key when there's nothing to erase produces a loud beep sound. You may need to pay attention to this 🫣
-
-5. Stop the GDM service:
-```
-sudo systemctl stop gdm
-```
-
-6. Change to the path of the directory that includes the downloaded `.run` file using `cd`
-
-7. Run the installer:
-```
-chmod +x NVIDIA-Linux-x86_64-555.42.02.run
-sudo sh ./NVIDIA-Linux-x86_64-555.42.02.run
-```
-(make sure to replace the file name with the actual one that you got from the Nvidia website)
-
-8. The installer will guide you through everything. Please read everything with care and answer the prompts depending on the proper situation to avoid any problems.
-   
-NOTE: If the installer asks you to disable Nouveau, allow the installer to disable it for you. You may need to abort the installer after this, then run `sudo dracut --regenerate-all --force && reboot`, then follow steps 4 to 8 above in order to restart the installer again once the system has completed rebooting.
-
-9. Once the installer has completed installing the driver, run `reboot` to reboot your system. Your newly installed driver should be up and running once the system boots up (you may run `nvidia-smi` to confirm so).
+1. Follow the following sections in the same order:
+   - https://rpmfusion.org/Howto/NVIDIA#Latest.2FBeta_driver for the beta driver, or https://rpmfusion.org/Howto/NVIDIA#Current_GeForce.2FQuadro.2FTesla for the stable driver.
+   - https://rpmfusion.org/Howto/NVIDIA#VDPAU.2FVAAPI
+   - https://rpmfusion.org/Howto/NVIDIA#Vulkan
+   - https://rpmfusion.org/Howto/NVIDIA#NVENC.2FNVDEC
+     
+2. Run `sudo dracut --force` to update the initramfs
+3. Reboot the system to finalise the driver installation and configuration
 
 -----
 
 ## Driver uninstallation
 
-### Uninstalling the driver when installed through the official NVIDIA installer from the Nvidia.com website
-
-1. Switch to the terminal view of your system by pressing `Alt + Ctrl + F3` (if this does not switch from the GUI mode to the terminal mode for you, try `Alt + Ctrl + F1` or `Alt + Ctrl + F2` instead for a different tty)
-
-2. Stop the GDM service:
-```
-sudo systemctl stop gdm
-```
-
-3. To ensure that we can boot into the system graphically through the Nouveau driver after uninstalling the Nvidia driver, remove any Nouveau-blacklist entries that might have been created by the installer previously:
-```
-sudo rm -rf /lib/modprobe.d/nvidia-installer-*
-sudo rm -rf /etc/modprobe.d/nvidia-installer-*
-sudo rm -rf /usr/lib/modprobe.d/nvidia-installer-*
-sudo dracut --regenerate-all --force
-```
-
-4. Change to the path of the directory that includes the downloaded `.run` file using `cd` (NOTE: Make sure its the exact same `.run` file that you used to install the driver)
-
-5. Run the uninstaller:
-```
-chmod +x NVIDIA-Linux-x86_64-555.42.02.run
-sudo sh ./NVIDIA-Linux-x86_64-555.42.02.run --uninstall
-```
-(make sure to replace the file name with the actual one that you got from the Nvidia website)
-
-NOTE: Do not panic if the screen goes blank throughout the uninstallation process. This is easily fixable by switching to the GUI tty then back to the terminal one (i.e. `Alt + Ctrl + F1` then `Alt + Ctrl + F3` back)
-
-6. Reboot the system once the uninstalling process has finished.
+1. Follow https://rpmfusion.org/Howto/NVIDIA#Uninstall_the_NVIDIA_driver
+2. Reboot the system
 
 -----
 
 ## Issues faced after installing the NVIDIA drivers, and how to solve them
+
+### Getting a black screen on video players (VLC, etc)
+
+This may happen because most of the video/media players require openh264 which is not shipped by default with Fedora.
+
+Install `ffmpeg` and `libvacodec` using `sudo dnf install ffmpeg libavcodec-freeworld --allowerasing` as long as you have the rpmfusion-free repo enabled.
+
+This will install openh264 as well and shall fix the problem.
 
 ### Wayland is not shown as an option on the login screen (or the cog icon of the login screen doesn't show at all)
 
@@ -115,7 +60,8 @@ So first of all, make sure to have:
 - Version 555.42.02 or a higher version of the Nvidia driver
 - GNOME 46.1 or a higher version on your Fedora installation
 
-then continue reading below to make the experience even smoother:
+#### Pay attention please
+The packages shipped by the RPMFusion repository should already handle configuring everything for you to ensure the smoothest experience possible (for both Xorg and Wayland). However, if you are still experiencing issues, continue reading below:
 
 * Your system may be using the Mesa driver instead of the NVIDIA one on Wayland sessions. You can confirm this by typing `glxinfo|egrep "OpenGL vendor|OpenGL renderer*"`
 
@@ -183,3 +129,6 @@ then continue reading below to make the experience even smoother:
 - https://www.reddit.com/r/linux_gaming/comments/1bjhx8w/explicit_sync_protocol_just_merged_on_wayland/
 - https://www.reddit.com/r/linux_gaming/comments/1c9izpc/gnome_461_released_with_explicit_sync/
 - https://www.reddit.com/r/linux_gaming/comments/1cx8739/nvidia_555_driver_now_out_explicit_sync_support/
+- https://www.tecmint.com/install-nvidia-drivers-in-linux/
+- https://rpmfusion.org/Howto/NVIDIA
+- https://discussion.fedoraproject.org/t/video-playback-broken-after-upgrading-to-f39-libopenh264-so-7-is-missing-openh264-support-will-be-disabled/100019/2
