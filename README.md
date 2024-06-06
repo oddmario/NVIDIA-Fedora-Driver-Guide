@@ -1,17 +1,14 @@
-# NVIDIA Ubuntu Driver Guide
-A little guide to help you install & manage the NVIDIA GPU driver on your Ubuntu system(s)
+# NVIDIA Fedora Driver Guide
+A little guide to help you install & manage the NVIDIA GPU driver on your Fedora system(s)
 
-I am personally an **Ubuntu 24.04** user at the moment, so this is mostly what this guide applies to (though I believe it should work alright on newer releases, and also on older releases which are not old very old `[something like Ubuntu 20.04+]`)
+I am personally an **Fedora 40** user at the moment, so this is mostly what this guide applies to (though I believe it should work alright on newer releases, and also on older releases which are not old very old `[something like Fedora 38+]`)
 
 ## Index of content
 - [Driver installation](#driver-installation)
-  * [Through the graphics-drivers PPA repository](#installing-through-the-graphics-drivers-ppa-repository)
   * [Through the official NVIDIA installer from the Nvidia.com website](#installing-through-the-official-nvidia-installer-from-the-nvidiacom-website)
 - [Driver uninstallation](#driver-uninstallation)
-  * [When installed through the graphics-drivers PPA repository](#uninstalling-the-driver-when-installed-through-the-graphics-drivers-ppa-repository)
   * [When installed through the official NVIDIA installer from the Nvidia.com website](#uninstalling-the-driver-when-installed-through-the-official-nvidia-installer-from-the-nvidiacom-website)
 - [Issues faced after installing the NVIDIA drivers, and how to solve them](#issues-faced-after-installing-the-nvidia-drivers-and-how-to-solve-them)
-  * [Fix ghost "Unknown Display" issue](#theres-a-ghost-unknown-display-on-the-gnome-displays-settings-especially-if-you-followed-the-graphics-drivers-ppa-repository-installation-procedure)
   * [Wayland is no longer enabled/not visible on the login screen](#wayland-is-not-shown-as-an-option-on-the-login-screen-or-the-cog-icon-of-the-login-screen-doesnt-show-at-all)
   * [Fix Wayland issues (flickering, etc.)](#the-experience-on-wayland-is-not-the-smoothest-fix-wayland-issues)
 - [References](#references)
@@ -20,57 +17,34 @@ I am personally an **Ubuntu 24.04** user at the moment, so this is mostly what t
 
 ## Driver installation
 
-### Installing through the `graphics-drivers` PPA repository
-
-1. Ensure that you have uninstalled any previously installed NVIDIA drivers by running the below commands:
-```
-sudo apt-get remove --purge '^nvidia-.*'
-sudo apt autoremove
-reboot
-```
-
-2. Add the repository and install the driver:
-```
-sudo add-apt-repository ppa:graphics-drivers/ppa
-sudo apt update 
-sudo apt install nvidia-driver-555
-sudo reboot
-```
-
-NOTE: At the time this guide was last updated, 555 is the latest version of the driver available on the repository.
-
-Navigate to https://launchpad.net/~graphics-drivers/+archive/ubuntu/ppa to check what the latest version of the driver is, then replace the `driver-555` part with the version you would like to install.
-
-3. Once the system has rebooted, run `nvidia-smi` to confirm that the driver has been installed with no issues.
-
 ### Installing through the official NVIDIA installer from the Nvidia.com website
 
 This procedure is more advanced and is often not recommended. And despite so, this is actually the method that I use to maintain an installation of the driver on my own system(s). It shall go alright as long as you follow each step with patience and care :)
 
 1. Ensure that you have uninstalled any previously installed NVIDIA drivers by running the below commands:
 ```
-sudo apt-get remove --purge '^nvidia-.*'
-sudo apt autoremove
+sudo dnf remove xorg-x11-drv-nvidia\*
 reboot
 ```
 
-2. Ensure that you do not have a manually installed version of `libnvidia-egl-wayland1` (especially if you are going to install version 555+ of the Nvidia driver). The driver already includes it as stated @ https://us.download.nvidia.com/XFree86/Linux-x86_64/555.42.02/README/installedcomponents.html
+2. Upgrade the system packages and install the required dependencies:
 ```
-sudo apt remove libnvidia-egl-wayland1
+sudo dnf upgrade
+sudo dnf install kernel-devel kernel-headers gcc make dkms acpid libglvnd-glx libglvnd-opengl libglvnd-devel pkgconfig
 ```
 
 3. Navigate to https://www.nvidia.com/Download/index.aspx?lang=en-us and download the proper driver for your GPU and Linux architecture. The website should give you a file that ends with the `.run` file extension.
 
 **NOTE:** It would be lovely to store the downloaded `.run` file in a permanent place because you will need the exact same file if you would like to uninstall the driver later.
 
-4. Switch to the terminal view of your system by pressing `Ctrl + Alt + F3` (if this does not switch from the GUI mode to the terminal mode for you, try `Ctrl + Alt + F1` or `Ctrl + Alt + F2` instead for a different tty)
+4. Switch to the terminal view of your system by pressing `Alt + Ctrl + F3` (if this does not switch from the GUI mode to the terminal mode for you, try `Alt + Ctrl + F1` or `Alt + Ctrl + F2` instead for a different tty)
+
+**NOTE:** Something that freaked me out on the Fedora terminal tty is that using the backspace key when there's nothing to erase produces a loud beep sound. You may need to pay attention to this 🫣
 
 5. Stop the GDM service:
 ```
 sudo systemctl stop gdm
-sudo systemctl stop gdm3
 ```
-If this fails for you, try `sudo systemctl stop lightdm` instead.
 
 6. Change to the path of the directory that includes the downloaded `.run` file using `cd`
 
@@ -83,7 +57,7 @@ sudo sh ./NVIDIA-Linux-x86_64-555.42.02.run
 
 8. The installer will guide you through everything. Please read everything with care and answer the prompts depending on the proper situation to avoid any problems.
    
-NOTE: If the installer asks you to disable Nouveau, allow the installer to disable it for you. You may need to abort the installer after this, then run `sudo update-initramfs -u && reboot`, then follow steps 4 to 7 above in order to restart the installer again once the system has completed rebooting.
+NOTE: If the installer asks you to disable Nouveau, allow the installer to disable it for you. You may need to abort the installer after this, then run `sudo dracut --regenerate-all --force && reboot`, then follow steps 4 to 8 above in order to restart the installer again once the system has completed rebooting.
 
 9. Once the installer has completed installing the driver, run `reboot` to reboot your system. Your newly installed driver should be up and running once the system boots up (you may run `nvidia-smi` to confirm so).
 
@@ -91,32 +65,21 @@ NOTE: If the installer asks you to disable Nouveau, allow the installer to disab
 
 ## Driver uninstallation
 
-### Uninstalling the driver when installed through the `graphics-drivers` PPA repository
-
-Run:
-```
-sudo apt-get remove --purge '^nvidia-.*'
-sudo apt autoremove
-reboot
-```
-
 ### Uninstalling the driver when installed through the official NVIDIA installer from the Nvidia.com website
 
-1. Switch to the terminal view of your system by pressing `Ctrl + Alt + F3` (if this does not switch from the GUI mode to the terminal mode for you, try `Ctrl + Alt + F1` or `Ctrl + Alt + F2` instead for a different tty)
+1. Switch to the terminal view of your system by pressing `Alt + Ctrl + F3` (if this does not switch from the GUI mode to the terminal mode for you, try `Alt + Ctrl + F1` or `Alt + Ctrl + F2` instead for a different tty)
 
 2. Stop the GDM service:
 ```
 sudo systemctl stop gdm
-sudo systemctl stop gdm3
 ```
-If this fails for you, try `sudo systemctl stop lightdm` instead.
 
 3. To ensure that we can boot into the system graphically through the Nouveau driver after uninstalling the Nvidia driver, remove any Nouveau-blacklist entries that might have been created by the installer previously:
 ```
 sudo rm -rf /lib/modprobe.d/nvidia-installer-*
 sudo rm -rf /etc/modprobe.d/nvidia-installer-*
 sudo rm -rf /usr/lib/modprobe.d/nvidia-installer-*
-sudo update-initramfs -u
+sudo dracut --regenerate-all --force
 ```
 
 4. Change to the path of the directory that includes the downloaded `.run` file using `cd` (NOTE: Make sure its the exact same `.run` file that you used to install the driver)
@@ -128,7 +91,7 @@ sudo sh ./NVIDIA-Linux-x86_64-555.42.02.run --uninstall
 ```
 (make sure to replace the file name with the actual one that you got from the Nvidia website)
 
-NOTE: Do not panic if the screen goes blank throughout the uninstallation process. This is easily fixable by switching to the GUI tty then back to the terminal one (i.e. `Ctrl + Alt + F1` then `Ctrl + Alt + F3` back)
+NOTE: Do not panic if the screen goes blank throughout the uninstallation process. This is easily fixable by switching to the GUI tty then back to the terminal one (i.e. `Alt + Ctrl + F1` then `Alt + Ctrl + F3` back)
 
 6. Reboot the system once the uninstalling process has finished.
 
@@ -136,21 +99,9 @@ NOTE: Do not panic if the screen goes blank throughout the uninstallation proces
 
 ## Issues faced after installing the NVIDIA drivers, and how to solve them
 
-### There's a ghost "Unknown Display" on the GNOME Displays settings (especially if you followed the `graphics-drivers` PPA repository installation procedure).
-  
-This seems to be a bug reported at https://bugs.launchpad.net/ubuntu/+source/nvidia-graphics-drivers-535/+bug/2063222
-
-A workaround is:
-```
-[ Workaround ]
-
-1. sudo rm /dev/dri/card0
-2. Log in again.
-```
-
 ### Wayland is not shown as an option on the login screen (or the cog icon of the login screen doesn't show at all)
 
-1. Edit the `/etc/gdm3/custom.conf` file using `sudo nano /etc/gdm3/custom.conf`
+1. Edit the `/etc/gdm/custom.conf` file using `sudo nano /etc/gdm/custom.conf`
 2. Ensure that `WaylandEnable=true` is set in that file and make sure that it's uncommented (does not start with a `#`)
 3. Run `sudo ln -s /dev/null /etc/udev/rules.d/61-gdm.rules`
 4. Reboot the system
@@ -162,7 +113,7 @@ And this has actually already gotten much better starting from the NVIDIA driver
 
 So first of all, make sure to have:
 - Version 555.42.02 or a higher version of the Nvidia driver
-- GNOME 46.1 or a higher version on your Ubuntu installation
+- GNOME 46.1 or a higher version on your Fedora installation
 
 then continue reading below to make the experience even smoother:
 
@@ -172,7 +123,7 @@ then continue reading below to make the experience even smoother:
      
   1. Edit `/etc/default/grub` using `sudo nano /etc/default/grub`
   2. Add `nvidia-drm.modeset=1` and `nvidia-drm.fbdev=1` inside your `GRUB_CMDLINE_LINUX` (i.e. `GRUB_CMDLINE_LINUX="nvidia-drm.modeset=1 nvidia-drm.fbdev=1"`)
-  3. Run `sudo update-grub`
+  3. Run `sudo grub2-mkconfig -o /etc/grub2.cfg`
   4. Reboot the system
  
 * You may have the GSP firmware of Nvidia enabled, and this is known to cause some performance issues on the beta 555.42.02 version of the driver. Maybe this will be fixed in the future, but for now, we can disable the GSP firmware if needed.
@@ -183,13 +134,12 @@ then continue reading below to make the experience even smoother:
 
   1. Edit `/etc/default/grub` using `sudo nano /etc/default/grub`
   2. Add `nvidia.NVreg_EnableGpuFirmware=0` inside your `GRUB_CMDLINE_LINUX`
-  3. Run `sudo update-grub`
+  3. Run `sudo grub2-mkconfig -o /etc/grub2.cfg`
   4. Reboot the system
 
   See https://forums.developer.nvidia.com/t/major-kde-plasma-desktop-frameskip-lag-issues-on-driver-555/293606 for more information on this issue.
    
-* You may be missing the `libnvidia-egl-wayland1` package (which is often recommended). Try installing the package using `sudo apt install libnvidia-egl-wayland1` (**Please** don't do this if you installed version 555+ of the Nvidia driver since the driver installer already installs it for you).
-* for Google Chrome (and Chromium-based browsers in general), you may need to switch the "Preferred Ozone platform" flag to "Wayland" or "auto". Follow the steps below in order to apply this:
+* for Google Chrome (and Chromium-based browsers in general), you may need to switch the "Preferred Ozone platform" flag to "Wayland" or "auto" (this is not needed if you have both GNOME 46.1+ and Nvidia driver 555.42.02+). Follow the steps below in order to apply this:
   1. Go to chrome://flags
   2. Search "Preferred Ozone platform"
   3. Set the flag to "Wayland" or "auto"
@@ -204,7 +154,7 @@ then continue reading below to make the experience even smoother:
   
   1. Create or edit `/etc/modprobe.d/nvidia.conf` using `sudo nano /etc/modprobe.d/nvidia.conf`
   2. Add `options nvidia NVreg_PreserveVideoMemoryAllocations=1` to a new line
-  3. Run `sudo update-initramfs -u`
+  3. Run `sudo dracut --regenerate-all --force`
   4. Reboot the system
   5. Run `sudo cat /proc/driver/nvidia/params | grep "PreserveVideoMemoryAllocations"` to verify the parameter is now set
 
@@ -213,8 +163,6 @@ then continue reading below to make the experience even smoother:
 -----
 
 ## References
-- https://askubuntu.com/questions/206283/how-can-i-uninstall-a-nvidia-driver-completely/206289#206289
-- https://askubuntu.com/questions/1391245/getting-the-latest-nvidia-graphics-driver-through-software-updates/1391250#1391250
 - https://askubuntu.com/questions/271613/am-i-using-the-nouveau-driver-or-the-proprietary-nvidia-driver
 - https://github.com/lutris/docs/blob/master/InstallingDrivers.md
 - https://askubuntu.com/questions/66328/how-do-i-install-the-latest-nvidia-drivers-from-the-run-file/66335#66335
