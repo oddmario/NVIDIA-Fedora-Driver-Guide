@@ -16,23 +16,82 @@ I am personally an **Fedora 40** user at the moment, so this is mostly what this
 
 ## Driver installation
 
-1. Run `sudo dnf install kernel-devel kernel-headers gcc make dkms acpid libglvnd-glx libglvnd-opengl libglvnd-devel pkgconfig`
+1. Ensure that you have uninstalled any previously installed NVIDIA drivers:
+   * to uninstall any Nvidia drivers installed from the RPMFusion repository:
+      ```
+      sudo dnf remove xorg-x11-drv-nvidia\*
+      reboot
+      ```
+   * to uninstall any Nvidia drivers installed using this guide: [Driver uninstallation](#driver-uninstallation)
+2. Upgrade the system packages and install the required dependencies:
+```
+sudo dnf upgrade
+sudo dnf install kernel-devel kernel-headers gcc make dkms acpid libglvnd-glx libglvnd-opengl libglvnd-devel pkgconfig
+```
+3. Navigate to https://www.nvidia.com/Download/index.aspx?lang=en-us and download the proper driver for your GPU and Linux architecture. The website should give you a file that ends with the `.run` file extension.
 
-2. Follow the following sections in the same order:
-   - https://rpmfusion.org/Howto/NVIDIA#Latest.2FBeta_driver for the beta driver, or https://rpmfusion.org/Howto/NVIDIA#Current_GeForce.2FQuadro.2FTesla for the stable driver.
-   - https://rpmfusion.org/Howto/NVIDIA#VDPAU.2FVAAPI
-   - https://rpmfusion.org/Howto/NVIDIA#Vulkan
-   - https://rpmfusion.org/Howto/NVIDIA#NVENC.2FNVDEC
-     
-3. Run `sudo dracut --force` to update the initramfs
-4. Reboot the system to finalise the driver installation and configuration
+**NOTE:** It would be lovely to store the downloaded `.run` file in a permanent place because you will need the exact same file if you would like to uninstall the driver later.
+
+4. Switch to the terminal view of your system by pressing `Alt + Ctrl + F3` (if this does not switch from the GUI mode to the terminal mode for you, try `Alt + Ctrl + F1` or `Alt + Ctrl + F2` instead for a different tty)
+
+**NOTE:** Something that freaked me out on the Fedora terminal tty is that using the backspace key when there's nothing to erase produces a loud beep sound. You may need to pay attention to this 🫣
+
+5. Stop the GDM service:
+```
+sudo systemctl stop gdm
+```
+6. Change to the path of the directory that includes the downloaded `.run` file using `cd`
+
+7. Run the installer:
+```
+chmod +x NVIDIA-Linux-x86_64-555.42.02.run
+sudo sh ./NVIDIA-Linux-x86_64-555.42.02.run
+```
+(make sure to replace the file name with the actual one that you got from the Nvidia website)
+
+8. The installer will guide you through everything. Please read everything with care and answer the prompts depending on the proper situation to avoid any problems.
+   
+NOTE: If the installer asks you to disable Nouveau, allow the installer to disable it for you. You may need to abort the installer after this, then run `sudo dracut --regenerate-all --force && reboot`, then start again from step 4 once the system has completed rebooting.
+
+9. Once the installer has completed installing the driver, run `sudo dracut --regenerate-all --force` to update the initramfs.
+10. Edit `/etc/default/grub` using `sudo nano /etc/default/grub`
+11. Add `nvidia-drm.modeset=1` and `nvidia-drm.fbdev=1` inside your `GRUB_CMDLINE_LINUX` (i.e. `GRUB_CMDLINE_LINUX="nvidia-drm.modeset=1 nvidia-drm.fbdev=1"`)
+12. Run `sudo grub2-mkconfig -o /etc/grub2.cfg`
+13. Reboot the system
+14. Your newly installed driver should be up and running once the system boots up (you may run `nvidia-smi` to confirm so).
+15. In order to enable video acceleration support, you need to install these packages: `sudo dnf install nvidia-vaapi-driver libva-utils vdpauinfo` (make sure to reboot the system after installing these packages)
 
 -----
 
 ## Driver uninstallation
 
-1. Follow https://rpmfusion.org/Howto/NVIDIA#Uninstall_the_NVIDIA_driver
-2. Reboot the system
+1. Switch to the terminal view of your system by pressing `Alt + Ctrl + F3` (if this does not switch from the GUI mode to the terminal mode for you, try `Alt + Ctrl + F1` or `Alt + Ctrl + F2` instead for a different tty)
+
+2. Stop the GDM service:
+```
+sudo systemctl stop gdm
+```
+
+3. To ensure that we can boot into the system graphically through the Nouveau driver after uninstalling the Nvidia driver, remove any Nouveau-blacklist entries that might have been created by the installer previously:
+```
+sudo rm -rf /lib/modprobe.d/nvidia-installer-*
+sudo rm -rf /etc/modprobe.d/nvidia-installer-*
+sudo rm -rf /usr/lib/modprobe.d/nvidia-installer-*
+sudo dracut --regenerate-all --force
+```
+
+4. Change to the path of the directory that includes the downloaded `.run` file using `cd` (NOTE: Make sure its the exact same `.run` file that you used to install the driver)
+
+5. Run the uninstaller:
+```
+chmod +x NVIDIA-Linux-x86_64-555.42.02.run
+sudo sh ./NVIDIA-Linux-x86_64-555.42.02.run --uninstall
+```
+(make sure to replace the file name with the actual one that you got from the Nvidia website)
+
+NOTE: Do not panic if the screen goes blank throughout the uninstallation process. This is easily fixable by switching to the GUI tty then back to the terminal one (i.e. `Alt + Ctrl + F1` then `Alt + Ctrl + F3` back)
+
+6. Reboot the system once the uninstalling process has finished.
 
 -----
 
