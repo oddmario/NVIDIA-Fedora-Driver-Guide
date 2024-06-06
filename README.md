@@ -16,14 +16,16 @@ I am personally an **Fedora 40** user at the moment, so this is mostly what this
 
 ## Driver installation
 
-1. Follow the following sections in the same order:
+1. Run `sudo dnf install kernel-devel kernel-headers gcc make dkms acpid libglvnd-glx libglvnd-opengl libglvnd-devel pkgconfig`
+
+2. Follow the following sections in the same order:
    - https://rpmfusion.org/Howto/NVIDIA#Latest.2FBeta_driver for the beta driver, or https://rpmfusion.org/Howto/NVIDIA#Current_GeForce.2FQuadro.2FTesla for the stable driver.
    - https://rpmfusion.org/Howto/NVIDIA#VDPAU.2FVAAPI
    - https://rpmfusion.org/Howto/NVIDIA#Vulkan
    - https://rpmfusion.org/Howto/NVIDIA#NVENC.2FNVDEC
      
-2. Run `sudo dracut --force` to update the initramfs
-3. Reboot the system to finalise the driver installation and configuration
+3. Run `sudo dracut --force` to update the initramfs
+4. Reboot the system to finalise the driver installation and configuration
 
 -----
 
