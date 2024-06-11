@@ -14,6 +14,12 @@ I am personally a **Fedora 40** user at the moment, so this is mostly what this 
 
 -----
 
+> ## ⚠️ Warning
+> 
+> Please follow & read every part of this guide with fine care to avoid any problems.
+> 
+> Also do not worry if the system looks stuck during any rebooting step. It actually is not stuck! Kindly allow up to 2 minutes for the rebooting to complete.
+
 ## Driver installation
 
 1. Ensure that you have uninstalled any previously installed NVIDIA drivers:
@@ -80,15 +86,16 @@ sudo dracut --regenerate-all --force
 ```
 sudo dnf remove nvidia-vaapi-driver libva-utils vdpauinfo
 ```
-5. Switch to the terminal view of your system by pressing `Alt + Ctrl + F3` (if this does not switch from the GUI mode to the terminal mode for you, try `Alt + Ctrl + F1` or `Alt + Ctrl + F2` instead for a different tty)
-6. Stop the GDM service:
+5. Reboot the system to get any NVIDIA modules unloaded
+6. Once the system boots back up, switch to the terminal view of your system by pressing `Alt + Ctrl + F3` (if this does not switch from the GUI mode to the terminal mode for you, try `Alt + Ctrl + F1` or `Alt + Ctrl + F2` instead for a different tty)
+7. Stop the GDM service:
 ```
 sudo systemctl stop gdm
 ```
 **Kindly note** that it is important to stop the GNOME Display Manager (GDM) service throughout the driver installation/uninstallation process as it may cause trouble otherwise.
 
-7. Change to the path of the directory that includes the downloaded `.run` file using `cd` (NOTE: Make sure its the exact same `.run` file that you used to install the driver)
-8. Run the uninstaller:
+8. Change to the path of the directory that includes the downloaded `.run` file using `cd` (NOTE: Make sure its the exact same `.run` file that you used to install the driver)
+9. Run the uninstaller:
 ```
 chmod +x NVIDIA-Linux-x86_64-555.42.02.run
 sudo sh ./NVIDIA-Linux-x86_64-555.42.02.run --uninstall
@@ -97,7 +104,7 @@ sudo sh ./NVIDIA-Linux-x86_64-555.42.02.run --uninstall
 
 NOTE: Do not panic if the screen goes blank throughout the uninstallation process. This is easily fixable by switching to the GUI tty then back to the terminal one (i.e. `Alt + Ctrl + F1` then `Alt + Ctrl + F3` back)
 
-9. Reboot the system once the uninstalling process has finished.
+10. Reboot the system once the uninstalling process has finished.
 
 -----
 
