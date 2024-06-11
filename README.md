@@ -67,25 +67,28 @@ NOTE: If the installer asks you to disable Nouveau, allow the installer to disab
 
 ## Driver uninstallation
 
-1. Switch to the terminal view of your system by pressing `Alt + Ctrl + F3` (if this does not switch from the GUI mode to the terminal mode for you, try `Alt + Ctrl + F1` or `Alt + Ctrl + F2` instead for a different tty)
-
-2. Stop the GDM service:
-```
-sudo systemctl stop gdm
-```
-**Kindly note** that it is important to stop the GNOME Display Manager (GDM) service throughout the driver installation/uninstallation process as it may cause trouble otherwise.
-
-3. To ensure that we can boot into the system graphically through the Nouveau driver after uninstalling the Nvidia driver, remove any Nouveau-blacklist entries that might have been created by the installer previously:
+1. To ensure that we can boot into the system graphically through the Nouveau driver after uninstalling the Nvidia driver, remove any Nouveau-blacklist entries that might have been created by the installer previously:
 ```
 sudo rm -rf /lib/modprobe.d/nvidia-installer-*
 sudo rm -rf /etc/modprobe.d/nvidia-installer-*
 sudo rm -rf /usr/lib/modprobe.d/nvidia-installer-*
 sudo dracut --regenerate-all --force
 ```
-4. Remove any entries related to the NVIDIA driver (`nvidia-drm.modeset`, `nvidia-drm.fbdev`, etc) from your `/etc/default/grub` file. (__this is important__).
-5. Rebuild the GRUB configuration using `sudo grub2-mkconfig -o /etc/grub2.cfg`
-6. Change to the path of the directory that includes the downloaded `.run` file using `cd` (NOTE: Make sure its the exact same `.run` file that you used to install the driver)
-7. Run the uninstaller:
+2. Remove any entries related to the NVIDIA driver (`nvidia-drm.modeset`, `nvidia-drm.fbdev`, etc) from your `/etc/default/grub` file. (__this is important__).
+3. Rebuild the GRUB configuration using `sudo grub2-mkconfig -o /etc/grub2.cfg`
+4. Uninstall any installed NVIDIA video acceleration packages:
+```
+sudo dnf remove nvidia-vaapi-driver libva-utils vdpauinfo
+```
+5. Switch to the terminal view of your system by pressing `Alt + Ctrl + F3` (if this does not switch from the GUI mode to the terminal mode for you, try `Alt + Ctrl + F1` or `Alt + Ctrl + F2` instead for a different tty)
+6. Stop the GDM service:
+```
+sudo systemctl stop gdm
+```
+**Kindly note** that it is important to stop the GNOME Display Manager (GDM) service throughout the driver installation/uninstallation process as it may cause trouble otherwise.
+
+7. Change to the path of the directory that includes the downloaded `.run` file using `cd` (NOTE: Make sure its the exact same `.run` file that you used to install the driver)
+8. Run the uninstaller:
 ```
 chmod +x NVIDIA-Linux-x86_64-555.42.02.run
 sudo sh ./NVIDIA-Linux-x86_64-555.42.02.run --uninstall
@@ -94,11 +97,7 @@ sudo sh ./NVIDIA-Linux-x86_64-555.42.02.run --uninstall
 
 NOTE: Do not panic if the screen goes blank throughout the uninstallation process. This is easily fixable by switching to the GUI tty then back to the terminal one (i.e. `Alt + Ctrl + F1` then `Alt + Ctrl + F3` back)
 
-8. Reboot the system once the uninstalling process has finished.
-9. Uninstall any installed NVIDIA video acceleration packages:
-```
-sudo dnf remove nvidia-vaapi-driver libva-utils vdpauinfo
-```
+9. Reboot the system once the uninstalling process has finished.
 
 -----
 
