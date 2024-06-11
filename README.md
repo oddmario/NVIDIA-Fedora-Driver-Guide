@@ -170,10 +170,10 @@ then continue reading below to make the experience even smoother:
   You can check whether the module parameter is enabled or not by typing `sudo cat /proc/driver/nvidia/params | grep "PreserveVideoMemoryAllocations"`. If the value is `0` or missing, then the parameter is not enabled.
 
   To enable the preserve video memory allocations module paramter, please follow the below steps:
-  
-  1. Create or edit `/etc/modprobe.d/nvidia.conf` using `sudo nano /etc/modprobe.d/nvidia.conf`
-  2. Add `options nvidia NVreg_PreserveVideoMemoryAllocations=1` to a new line
-  3. Run `sudo dracut --regenerate-all --force`
+
+  1. Edit `/etc/default/grub` using `sudo nano /etc/default/grub`
+  2. Add `nvidia.NVreg_PreserveVideoMemoryAllocations=1` inside your `GRUB_CMDLINE_LINUX`
+  3. Run `sudo grub2-mkconfig -o /etc/grub2.cfg`
   4. Reboot the system
   5. Run `sudo cat /proc/driver/nvidia/params | grep "PreserveVideoMemoryAllocations"` to verify the parameter is now set
 
