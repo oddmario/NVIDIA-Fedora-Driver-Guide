@@ -16,7 +16,7 @@ I am personally a **Fedora 40** user at the moment, so this is mostly what this 
 
 > ## ⚠️ Warning
 > 
-> Please follow & read every part of this guide with fine care to avoid any problems.
+> Please follow & read every part of this guide with fine care to avoid the occurrence of any problems.
 > 
 > Also do not worry if the system looks stuck during any rebooting step. It actually is not stuck! Kindly allow up to 2 minutes for the rebooting to complete.
 
