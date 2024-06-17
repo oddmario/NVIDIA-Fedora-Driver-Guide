@@ -3,6 +3,11 @@ A little guide to help you install & manage the NVIDIA GPU driver on your Fedora
 
 I am personally a **Fedora 40** user at the moment, so this is mostly what this guide applies to (though I believe it should work alright on newer releases, and also on older releases which are not old very old `[something like Fedora 38+]`)
 
+### ❗ Kindly note
+that this guide explicates the procedure of installing & uninstalling the driver through the official Nvidia driver installer downloaded from nvidia.com.
+
+If you would like to install the driver using the RPMFusion repository instead, please refer to https://rpmfusion.org/Howto/NVIDIA
+
 ## Index of content
 - [Driver installation](#driver-installation)
 - [Driver uninstallation](#driver-uninstallation)
