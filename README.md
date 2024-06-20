@@ -13,7 +13,7 @@ If you would like to install the driver using the RPMFusion repository instead, 
 - [Driver uninstallation](#driver-uninstallation)
 - [Issues faced after installing the NVIDIA drivers, and how to solve them](#issues-faced-after-installing-the-nvidia-drivers-and-how-to-solve-them)
   * [Fix VLC black screen issue](#getting-a-black-screen-on-video-players-vlc-etc)
-  * [Wayland is no longer enabled/not visible on the login screen](#wayland-is-not-shown-as-an-option-on-the-login-screen-or-the-cog-icon-of-the-login-screen-doesnt-show-at-all)
+  * [(for GNOME) Wayland is no longer enabled/not visible on the login screen](#on-gnome-wayland-is-not-shown-as-an-option-on-the-login-screen-or-the-cog-icon-of-the-login-screen-doesnt-show-at-all)
   * [Fix Wayland issues (flickering, etc.)](#the-experience-on-wayland-is-not-the-smoothest-fix-wayland-issues)
 - [References](#references)
 
@@ -160,7 +160,7 @@ then continue reading below to make the experience even smoother:
   3. Run `sudo grub2-mkconfig -o /etc/grub2.cfg`
   4. Reboot the system
  
-* You may have the GSP firmware of Nvidia enabled, and this is known to cause some performance issues on the beta 555.42.02 version of the driver. Maybe this will be fixed in the future, but for now, we can disable the GSP firmware if needed.
+* You may have the GSP firmware of Nvidia enabled, and this is known to cause some performance issues ([especially on KDE Plasma](https://forums.developer.nvidia.com/t/major-kde-plasma-desktop-frameskip-lag-issues-on-driver-555/293606/1)) on the beta 555.42.02 version of the driver. Maybe this will be fixed in the future, but for now, we can disable the GSP firmware if needed.
 
   You can check whether the GSP firmware is enabled or no by typing `nvidia-smi -q | grep "GSP Firmware"` — if it says `N/A` then the firmware is not enabled. If otherwise (it shows a version for GSP firmware) then the firmware is enabled.
 
