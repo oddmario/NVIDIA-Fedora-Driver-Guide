@@ -51,7 +51,11 @@ sudo dnf install kernel-devel kernel-headers gcc make dkms acpid libglvnd-glx li
 ```
 sudo systemctl stop gdm
 ```
-**Kindly note** that it is important to stop the GNOME Display Manager (GDM) service throughout the driver installation/uninstallation process as it may cause trouble otherwise.
+or if you are using the ***Fedora KDE*** spin, stop the SDDM service:
+```
+sudo systemctl stop sddm
+```
+**Kindly note** that it is important to stop the display manager (GDM/SDDM) service throughout the driver installation/uninstallation process as it may cause trouble otherwise.
 
 6. Change to the path of the directory that includes the downloaded `.run` file using `cd`
 
@@ -97,7 +101,11 @@ sudo dnf remove nvidia-vaapi-driver libva-utils vdpauinfo
 ```
 sudo systemctl stop gdm
 ```
-**Kindly note** that it is important to stop the GNOME Display Manager (GDM) service throughout the driver installation/uninstallation process as it may cause trouble otherwise.
+or if you are using the ***Fedora KDE*** spin, stop the SDDM service:
+```
+sudo systemctl stop sddm
+```
+**Kindly note** that it is important to stop the display manager (GDM/SDDM) service throughout the driver installation/uninstallation process as it may cause trouble otherwise.
 
 8. Change to the path of the directory that includes the downloaded `.run` file using `cd` (NOTE: Make sure its the exact same `.run` file that you used to install the driver)
 9. Run the uninstaller:
@@ -123,12 +131,14 @@ Install `ffmpeg` and `libvacodec` using `sudo dnf install ffmpeg libavcodec-free
 
 This will install openh264 as well and shall fix the problem.
 
-### Wayland is not shown as an option on the login screen (or the cog icon of the login screen doesn't show at all)
+### (on GNOME) Wayland is not shown as an option on the login screen (or the cog icon of the login screen doesn't show at all)
 
 1. Edit the `/etc/gdm/custom.conf` file using `sudo nano /etc/gdm/custom.conf`
 2. Ensure that `WaylandEnable=true` is set in that file and make sure that it's uncommented (does not start with a `#`)
 3. Run `sudo ln -s /dev/null /etc/udev/rules.d/61-gdm.rules`
 4. Reboot the system
+
+The above doesn't apply to a Fedora KDE spin installation since it enforces the use of Wayland and does not have X11 anyway.
 
 ### The experience on Wayland is not the smoothest (fix Wayland issues)
 
@@ -137,7 +147,7 @@ And this has actually already gotten much better starting from the NVIDIA driver
 
 So first of all, make sure to have:
 - Version 555.42.02 or a higher version of the Nvidia driver
-- GNOME 46.1 or a higher version on your Fedora installation
+- GNOME 46.1+ (or KDE Plasma 6.1+) on your Fedora installation
 
 then continue reading below to make the experience even smoother:
 
@@ -163,7 +173,7 @@ then continue reading below to make the experience even smoother:
 
   See https://forums.developer.nvidia.com/t/major-kde-plasma-desktop-frameskip-lag-issues-on-driver-555/293606 for more information on this issue.
    
-* for Google Chrome (and Chromium-based browsers in general), you may need to switch the "Preferred Ozone platform" flag to "Wayland" or "auto" (this is not needed if you have both GNOME 46.1+ and Nvidia driver 555.42.02+). Follow the steps below in order to apply this:
+* for Google Chrome (and Chromium-based browsers in general), you may need to switch the "Preferred Ozone platform" flag to "Wayland" or "auto" (this is not needed if you have both GNOME 46.1+/KDE Plasma 6.1+ and Nvidia driver 555.42.02+). Follow the steps below in order to apply this:
   1. Go to chrome://flags
   2. Search "Preferred Ozone platform"
   3. Set the flag to "Wayland" or "auto"
