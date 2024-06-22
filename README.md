@@ -14,6 +14,7 @@ If you would like to install the driver using the RPMFusion repository instead, 
 - [Issues faced after installing the NVIDIA drivers, and how to solve them](#issues-faced-after-installing-the-nvidia-drivers-and-how-to-solve-them)
   * [Fix VLC black screen issue](#getting-a-black-screen-on-video-players-vlc-etc)
   * [(for GNOME) Wayland is no longer enabled/not visible on the login screen](#on-gnome-wayland-is-not-shown-as-an-option-on-the-login-screen-or-the-cog-icon-of-the-login-screen-doesnt-show-at-all)
+  * [(on KDE Plasma) The taskbar (KDE Plasma panel) freezes occasionally](#on-kde-plasma-the-taskbar-kde-plasma-panel-freezes-occasionally)
   * [Fix Wayland issues (flickering, etc.)](#the-experience-on-wayland-is-not-the-smoothest-fix-wayland-issues)
 - [References](#references)
 
@@ -72,7 +73,7 @@ NOTE: If the installer asks you to disable Nouveau, allow the installer to disab
 
 9. Once the installer has completed installing the driver, run `sudo dracut --regenerate-all --force` to update the initramfs.
 10. Edit `/etc/default/grub` using `sudo nano /etc/default/grub`
-11. Add `nvidia-drm.modeset=1` and `nvidia-drm.fbdev=1` inside your `GRUB_CMDLINE_LINUX` (i.e. `GRUB_CMDLINE_LINUX="nvidia-drm.modeset=1 nvidia-drm.fbdev=1"`)
+11. Add `nvidia-drm.modeset=1` and `nvidia.NVreg_PreserveVideoMemoryAllocations=1` inside your `GRUB_CMDLINE_LINUX` (i.e. `GRUB_CMDLINE_LINUX="nvidia-drm.modeset=1 nvidia.NVreg_PreserveVideoMemoryAllocations=1"`)
 12. Run `sudo grub2-mkconfig -o /etc/grub2.cfg`
 13. Reboot the system
 14. Your newly installed driver should be up and running once the system boots up (you may run `nvidia-smi` to confirm so).
@@ -145,6 +146,27 @@ See https://discussion.fedoraproject.org/t/cant-play-videos-in-firefox/79645/25 
 
 The above doesn't apply to a Fedora KDE spin installation since it enforces the use of Wayland and does not have X11 anyway.
 
+### (on KDE Plasma) The taskbar (KDE Plasma panel) freezes occasionally
+
+Upon checking `journalctl -f --priority err`, I found this line:
+```
+kwin_wayland[1834]: kwin_scene_opengl: Invalid framebuffer status:  "GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT"
+```
+
+This may happen when you have the Nvidia driver `fbdev` parameter enabled.
+
+> The fbdev parameter tells the NVIDIA driver to provide its own framebuffer device instead of relying on `efifb` or `vesafb`.
+
+This parameter is still an experimental one and may cause issues. You can try experiment around disabling it to see if this makes things better for you.
+
+To disable the fbdev parameter:
+1. Edit `/etc/default/grub` using `sudo nano /etc/default/grub`
+2. Add `nvidia-drm.fbdev=0` inside your `GRUB_CMDLINE_LINUX`
+3. Run `sudo grub2-mkconfig -o /etc/grub2.cfg`
+4. Reboot the system
+
+Now the output of `sudo cat /sys/module/nvidia_drm/parameters/fbdev` should be `N`, which indicates that the fbdev parameter is disabled.
+
 ### The experience on Wayland is not the smoothest (fix Wayland issues)
 
 This may happen for a lot of reasons. For a while now, NVIDIA has been known to have issues with the Wayland windowing system. However, NVIDIA has been working on making this better.
@@ -161,7 +183,7 @@ then continue reading below to make the experience even smoother:
   In order to solve this:
      
   1. Edit `/etc/default/grub` using `sudo nano /etc/default/grub`
-  2. Add `nvidia-drm.modeset=1` and `nvidia-drm.fbdev=1` inside your `GRUB_CMDLINE_LINUX` (i.e. `GRUB_CMDLINE_LINUX="nvidia-drm.modeset=1 nvidia-drm.fbdev=1"`)
+  2. Add `nvidia-drm.modeset=1` inside your `GRUB_CMDLINE_LINUX` (i.e. `GRUB_CMDLINE_LINUX="nvidia-drm.modeset=1"`)
   3. Run `sudo grub2-mkconfig -o /etc/grub2.cfg`
   4. Reboot the system
  
@@ -222,6 +244,8 @@ then continue reading below to make the experience even smoother:
 - https://www.reddit.com/r/linux_gaming/comments/1bjhx8w/explicit_sync_protocol_just_merged_on_wayland/
 - https://www.reddit.com/r/linux_gaming/comments/1c9izpc/gnome_461_released_with_explicit_sync/
 - https://www.reddit.com/r/linux_gaming/comments/1cx8739/nvidia_555_driver_now_out_explicit_sync_support/
+- https://wiki.archlinux.org/title/NVIDIA
 - https://www.tecmint.com/install-nvidia-drivers-in-linux/
 - https://rpmfusion.org/Howto/NVIDIA
+- https://www.if-not-true-then-false.com/2015/fedora-nvidia-guide/
 - https://discussion.fedoraproject.org/t/video-playback-broken-after-upgrading-to-f39-libopenh264-so-7-is-missing-openh264-support-will-be-disabled/100019/2
