@@ -222,6 +222,8 @@ then continue reading below to make the experience even smoother:
 - https://www.reddit.com/r/linux_gaming/comments/1bjhx8w/explicit_sync_protocol_just_merged_on_wayland/
 - https://www.reddit.com/r/linux_gaming/comments/1c9izpc/gnome_461_released_with_explicit_sync/
 - https://www.reddit.com/r/linux_gaming/comments/1cx8739/nvidia_555_driver_now_out_explicit_sync_support/
+- https://wiki.archlinux.org/title/NVIDIA
 - https://www.tecmint.com/install-nvidia-drivers-in-linux/
 - https://rpmfusion.org/Howto/NVIDIA
+- https://www.if-not-true-then-false.com/2015/fedora-nvidia-guide/
 - https://discussion.fedoraproject.org/t/video-playback-broken-after-upgrading-to-f39-libopenh264-so-7-is-missing-openh264-support-will-be-disabled/100019/2
