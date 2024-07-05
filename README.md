@@ -41,8 +41,6 @@ sudo dnf install kernel-devel kernel-headers gcc make dkms acpid libglvnd-glx li
 ```
 3. Navigate to https://www.nvidia.com/Download/index.aspx?lang=en-us and download the proper driver for your GPU and Linux architecture. The website should give you a file that ends with the `.run` file extension.
 
-**NOTE:** It would be lovely to store the downloaded `.run` file in a permanent place because you will need the exact same file if you would like to uninstall the driver later.
-
 4. Switch to the terminal view of your system by pressing `Alt + Ctrl + F3` (if this does not switch from the GUI mode to the terminal mode for you, try `Alt + Ctrl + F1` or `Alt + Ctrl + F2` instead for a different tty)
 
 **NOTE:** Something that freaked me out on the Fedora terminal tty is that using the backspace key when there's nothing to erase produces a loud beep sound. You may need to pay attention to this 🫣
@@ -87,7 +85,6 @@ NOTE: If the installer asks you to disable Nouveau, allow the installer to disab
 sudo rm -rf /lib/modprobe.d/nvidia-installer-*
 sudo rm -rf /etc/modprobe.d/nvidia-installer-*
 sudo rm -rf /usr/lib/modprobe.d/nvidia-installer-*
-sudo dracut --regenerate-all --force
 ```
 2. Remove any entries related to the NVIDIA driver (`nvidia-drm.modeset`, `nvidia-drm.fbdev`, etc) from your `/etc/default/grub` file. (__this is important__).
 3. Rebuild the GRUB configuration using `sudo grub2-mkconfig -o /etc/grub2.cfg`
@@ -95,29 +92,21 @@ sudo dracut --regenerate-all --force
 ```
 sudo dnf remove nvidia-vaapi-driver libva-utils vdpauinfo
 ```
-5. Reboot the system to get any NVIDIA modules unloaded
-6. Once the system boots back up, switch to the terminal view of your system by pressing `Alt + Ctrl + F3` (if this does not switch from the GUI mode to the terminal mode for you, try `Alt + Ctrl + F1` or `Alt + Ctrl + F2` instead for a different tty)
-7. Stop the GDM service:
+5. Run the uninstaller:
 ```
-sudo systemctl stop gdm
+sudo nvidia-installer --uninstall
 ```
-or if you are using the ***Fedora KDE*** spin, stop the SDDM service:
+6. Run the below commands to restore everything to how it was before the installation of the driver:
 ```
-sudo systemctl stop sddm
+sudo rm -f /usr/lib{,64}/libGL.so.* /usr/lib{,64}/libEGL.so.*
+sudo rm -f /usr/lib{,64}/xorg/modules/extensions/libglx.so
+sudo dnf reinstall xorg-x11-server-Xorg mesa-libGL mesa-libEGL libglvnd\*
 ```
-**Kindly note** that it is important to stop the display manager (GDM/SDDM) service throughout the driver installation/uninstallation process as it may cause trouble otherwise.
-
-8. Change to the path of the directory that includes the downloaded `.run` file using `cd` (NOTE: Make sure its the exact same `.run` file that you used to install the driver)
-9. Run the uninstaller:
+7. Rebuild the system initramfs:
 ```
-chmod +x NVIDIA-Linux-x86_64-555.42.02.run
-sudo sh ./NVIDIA-Linux-x86_64-555.42.02.run --uninstall
+sudo dracut --regenerate-all --force
 ```
-(make sure to replace the file name with the actual one that you got from the Nvidia website)
-
-NOTE: Do not panic if the screen goes blank throughout the uninstallation process. This is easily fixable by switching to the GUI tty then back to the terminal one (i.e. `Alt + Ctrl + F1` then `Alt + Ctrl + F3` back)
-
-10. Reboot the system once the uninstalling process has finished.
+8. Reboot the system once the uninstalling process has finished.
 
 -----
 
@@ -226,4 +215,5 @@ then continue reading below to make the experience even smoother:
 - https://www.tecmint.com/install-nvidia-drivers-in-linux/
 - https://rpmfusion.org/Howto/NVIDIA
 - https://www.if-not-true-then-false.com/2015/fedora-nvidia-guide/
+- https://www.if-not-true-then-false.com/2015/fedora-nvidia-guide/3/
 - https://discussion.fedoraproject.org/t/video-playback-broken-after-upgrading-to-f39-libopenh264-so-7-is-missing-openh264-support-will-be-disabled/100019/2
