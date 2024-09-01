@@ -121,7 +121,7 @@ To solve this:
 sudo dnf config-manager --enable fedora-cisco-openh264 -y
 sudo dnf install openh264 mozilla-openh264 libavcodec-freeworld ffmpeg mpv vlc gstreamer1-plugins-bad-freeworld gstreamer1-plugins-ugly
 ```
-You may need to have the RPMFusion free and nonfree repos enabled for some of the above packages.
+You may need to [have the RPMFusion free and nonfree repos enabled](https://rpmfusion.org/Configuration) for some of the above packages.
 
 See https://discussion.fedoraproject.org/t/cant-play-videos-in-firefox/79645/25 and https://discussion.fedoraproject.org/t/codecs-missing-failing-to-play-h-264/104643/2 for more information on this matter.
 
